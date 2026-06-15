@@ -46,11 +46,43 @@ export default function App() {
   
   // Interactive booking basket state (transient)
   const [basketItems, setBasketItems] = useState<SelectedItem[]>([]);
+  const [bookingStep, setBookingStep] = useState<number>(1);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('addr-1');
   const [selectedDateOffset, setSelectedDateOffset] = useState<number>(1); // Tomorrow default
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(TIME_SLOTS[0]);
   const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'online_payment' | 'whatsapp'>('cash_on_delivery');
   const [specialInstructions, setSpecialInstructions] = useState('');
+
+  // Helper to compute basket values
+  const getBasketTotals = () => {
+    let subtotal = 0;
+    let shirtIronQty = 0;
+    
+    basketItems.forEach(item => {
+      let rate = 20;
+      if (item.id === 'shirt') {
+        rate = item.service === 'ironing' ? 20 : item.service === 'wash_iron' ? 55 : 110;
+        if (item.service === 'ironing') shirtIronQty += item.quantity;
+      }
+      else if (item.id === 'trouser') { rate = item.service === 'ironing' ? 20 : item.service === 'wash_iron' ? 60 : 120; }
+      else if (item.id === 'saree') { rate = item.service === 'ironing' ? 40 : item.service === 'wash_iron' ? 99 : 220; }
+      else if (item.id === 'bedsheet') { rate = 50; }
+      else { rate = 20; }
+      subtotal += rate * item.quantity;
+    });
+
+    let savings = 0;
+    if (isFirstOrderApplied && shirtIronQty > 0) {
+      const freeCount = Math.min(3, shirtIronQty);
+      savings = freeCount * 20;
+    }
+
+    return {
+      subtotal,
+      savings,
+      finalAmount: Math.max(0, subtotal - savings)
+    };
+  };
 
   // Promos
   const [isFirstOrderApplied, setIsFirstOrderApplied] = useState(true);
@@ -65,12 +97,19 @@ export default function App() {
   // Auto-dismiss toast
   useEffect(() => {
     if (successToast) {
-      const timer = setTimeout(() => {
+       const timer = setTimeout(() => {
         setSuccessToast(null);
       }, 4050);
       return () => clearTimeout(timer);
     }
   }, [successToast]);
+
+  // Reset bookingStep when leaving or changing tabs
+  useEffect(() => {
+    if (activeTab === 'booking' && basketItems.length === 0) {
+      setBookingStep(1);
+    }
+  }, [activeTab, basketItems.length]);
 
   // Advance Order simulation flow
   const handleAdvanceStatus = (orderId: string) => {
@@ -387,233 +426,380 @@ export default function App() {
 
               {/* ===================== tab: BOOKING ===================== */}
               {activeTab === 'booking' && (
-                <div className="animate-fade-in space-y-6 px-5 pt-4.5">
-                  <div className="bg-[#FAFDFB] p-4.5 rounded-3xl border border-gray-100 shadow-2xs flex items-center justify-between">
+                <div className="animate-fade-in space-y-5 px-5 pt-4.5 pb-6">
+                  {/* Form Header */}
+                  <div className="bg-[#FAFDFB] p-4 rounded-2xl border border-gray-100 shadow-2xs flex items-center justify-between">
                     <div>
-                      <h2 className="text-lg font-black text-brand-navy uppercase tracking-tight">Atelier Booking Form</h2>
+                      <h2 className="text-base font-black text-brand-navy uppercase tracking-tight">Atelier Step Booking</h2>
                       <span className="text-[9px] text-[#4E9F3D] uppercase tracking-widest font-mono font-black block mt-0.5">
-                        Build carriage details
+                        Step {bookingStep} of 3 • Chennai Doorstep
                       </span>
                     </div>
                     <ShoppingBag className="w-5 h-5 text-brand-green" />
                   </div>
 
-                  {/* Toggle first order coupon */}
-                  <div className="bg-white p-3.5 rounded-2xl border border-red-200/50 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-brand-accent shrink-0" />
-                      <div>
-                        <span className="font-bold text-slate-800 block">First Order Promo (3 Shirts Free)</span>
-                        <span className="text-[9.5px] text-gray-400 block font-semibold">Save ₹60 on your very first booking</span>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={isFirstOrderApplied}
-                        onChange={(e) => {
-                          setIsFirstOrderApplied(e.target.checked);
-                          setSuccessToast(e.target.checked ? "Activated first order free-laundry offer!" : "Deactivated first order promo.");
-                        }}
-                        className="sr-only peer"
-                      />
-                      <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-green"></div>
-                    </label>
-                  </div>
+                  {/* Progressive Stepper Indicator */}
+                  <div className="flex items-center justify-between p-3.5 bg-white border border-gray-100 rounded-2xl shadow-3xs select-none">
+                    {[
+                      { step: 1, title: 'Garments', icon: <ShoppingBag className="w-3.5 h-3.5" /> },
+                      { step: 2, title: 'Schedule', icon: <Clock className="w-3.5 h-3.5" /> },
+                      { step: 3, title: 'Spot & Pay', icon: <MapPin className="w-3.5 h-3.5" /> },
+                    ].map((s, idx) => {
+                      const isActive = bookingStep === s.step;
+                      const isCompleted = bookingStep > s.step;
+                      const isDisabled = s.step > 1 && basketItems.length === 0;
 
-                  {/* Garment picker core interface */}
-                  <GarmentPicker 
-                    selectedItems={basketItems}
-                    onItemsChange={setBasketItems}
-                    isFirstOrderApplied={isFirstOrderApplied}
-                  />
-
-                  {/* Scheduling Section */}
-                  {basketItems.length > 0 && (
-                    <div className="space-y-4">
-                      
-                      {/* Pick a carriage date */}
-                      <div className="space-y-2.5 text-left">
-                        <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">Select Valet Pickup Day</span>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[0, 1, 2].map((offset) => {
-                            const d = new Date();
-                            d.setDate(d.getDate() + offset);
-                            const dayName = offset === 0 ? 'Today' : offset === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short' });
-                            const isSelected = selectedDateOffset === offset;
-
-                            return (
-                              <button
-                                key={offset}
-                                type="button"
-                                onClick={() => setSelectedDateOffset(offset)}
-                                className={`p-3 rounded-2xl border text-center cursor-pointer transition-all ${
-                                  isSelected 
-                                    ? 'bg-brand-navy text-[#FAFDFB] border-brand-navy shadow-sm' 
-                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-slate-50'
-                                }`}
-                              >
-                                <span className="text-[10px] font-sans font-bold tracking-widest block uppercase">{dayName}</span>
-                                <span className="text-[8px] block opacity-85 mt-1 font-mono font-bold">
-                                  {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Time Slot List */}
-                      <div className="space-y-2.5 text-left">
-                        <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">Select Valet Hour window</span>
-                        <div className="grid grid-cols-1 gap-1.5">
-                          {TIME_SLOTS.map((slot) => {
-                            const isSelected = selectedTimeSlot === slot;
-                            return (
-                              <button
-                                key={slot}
-                                type="button"
-                                onClick={() => setSelectedTimeSlot(slot)}
-                                className={`p-3 rounded-2xl border text-left flex items-center justify-between text-xs font-bold transition-all ${
-                                  isSelected 
-                                    ? 'bg-white border-brand-green text-brand-navy shadow-3xs ring-1 ring-brand-green/35' 
-                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-slate-50'
-                                }`}
-                              >
-                                <span>{slot}</span>
-                                {isSelected ? (
-                                  <span className="w-4 h-4 bg-brand-green rounded-full flex items-center justify-center text-[9px] text-white">✓</span>
-                                ) : (
-                                  <div className="w-4 h-4 border border-gray-300 rounded-full" />
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Selection Address Drops */}
-                      <div className="space-y-2.5 text-left">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy">Carriage Spot</span>
+                      return (
+                        <React.Fragment key={s.step}>
                           <button
                             type="button"
-                            onClick={() => {
-                              setIsAddrModalOpen(true);
-                              setNewAddrLabel('Home');
-                              setNewAddrDetails('');
-                              setNewAddrPhone('');
-                              setNewAddrLandmark('');
-                            }}
-                            className="text-[10px] text-brand-accent font-black uppercase hover:underline"
+                            disabled={isDisabled}
+                            onClick={() => setBookingStep(s.step)}
+                            className="flex flex-col items-center flex-1 focus:outline-none group cursor-pointer transition-all"
                           >
-                            + Add Spot Address
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all ${
+                              isActive 
+                                ? 'bg-brand-green text-white ring-4 ring-brand-green/20 scale-105' 
+                                : isCompleted 
+                                  ? 'bg-brand-navy text-[#FAFDFB]' 
+                                  : 'bg-slate-100 text-gray-400 group-hover:bg-slate-205'
+                            }`}>
+                              {isCompleted ? '✓' : s.step}
+                            </div>
+                            <span className={`text-[8.5px] uppercase tracking-wider font-extrabold mt-1.5 transition-colors ${isActive ? 'text-brand-green' : 'text-gray-400'}`}>
+                              {s.title}
+                            </span>
+                          </button>
+                          {idx < 2 && (
+                            <div className={`h-0.5 w-6 transition-all ${bookingStep > s.step ? 'bg-brand-navy' : 'bg-gray-200'}`} />
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+
+                  {/* ACTIVE STEP ANIMATION ROUTING */}
+                  <AnimatePresence mode="wait">
+                    {bookingStep === 1 && (
+                      <motion.div
+                        key="step-1"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        className="space-y-4"
+                      >
+                        {/* Toggle first order coupon */}
+                        <div className="bg-white p-3.5 rounded-2xl border border-red-200/50 flex items-center justify-between text-xs shadow-3xs">
+                          <div className="flex items-center gap-2">
+                            <Gift className="w-4 h-4 text-brand-accent shrink-0" />
+                            <div>
+                              <span className="font-bold text-slate-800 block">First Order Promo (3 Shirts Free)</span>
+                              <span className="text-[9.5px] text-gray-400 block font-semibold font-mono">Save ₹60 on ironing</span>
+                            </div>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={isFirstOrderApplied}
+                              onChange={(e) => {
+                                setIsFirstOrderApplied(e.target.checked);
+                                setSuccessToast(e.target.checked ? "Activated first order free-laundry offer!" : "Deactivated first order promo.");
+                              }}
+                              className="sr-only peer"
+                            />
+                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-green"></div>
+                          </label>
+                        </div>
+
+                        {/* Garment picker core interface */}
+                        <GarmentPicker 
+                          selectedItems={basketItems}
+                          onItemsChange={setBasketItems}
+                          isFirstOrderApplied={isFirstOrderApplied}
+                        />
+
+                        {/* Step 1 Control Bar */}
+                        <div className="pt-2">
+                          {basketItems.length > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => setBookingStep(2)}
+                              className="w-full bg-brand-green hover:bg-brand-accent text-[#FAFDFB] text-xs font-black uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] shadow-md shadow-brand-green/10 animate-pulse"
+                            >
+                              <span>Choose Pickup Schedule</span>
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-center space-y-2">
+                              <ShoppingBag className="w-6 h-6 text-emerald-600/60 mx-auto" />
+                              <p className="text-[11px] text-emerald-800 font-semibold leading-relaxed">
+                                Please add some garments (count Shirts, Trousers, Sarees, etc. above) to start your zero-charge doorstep pickup carriage process.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {bookingStep === 2 && (
+                      <motion.div
+                        key="step-2"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="space-y-5"
+                      >
+                        {/* Pick a carriage date */}
+                        <div className="space-y-2 text-left">
+                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">1. Select Valet Pickup Day</span>
+                          <div className="grid grid-cols-3 gap-2">
+                            {[0, 1, 2].map((offset) => {
+                              const d = new Date();
+                              d.setDate(d.getDate() + offset);
+                              const dayName = offset === 0 ? 'Today' : offset === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short' });
+                              const isSelected = selectedDateOffset === offset;
+
+                              return (
+                                <button
+                                  key={offset}
+                                  type="button"
+                                  onClick={() => setSelectedDateOffset(offset)}
+                                  className={`p-3 rounded-xl border text-center cursor-pointer transition-all ${
+                                    isSelected 
+                                      ? 'bg-brand-navy text-[#FAFDFB] border-brand-navy shadow-sm' 
+                                      : 'bg-white border-gray-200 text-gray-600 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <span className="text-[10px] font-sans font-bold tracking-widest block uppercase">{dayName}</span>
+                                  <span className="text-[8px] block opacity-85 mt-1 font-mono font-bold">
+                                    {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Time Slot List */}
+                        <div className="space-y-2 text-left">
+                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">2. Select Valet Hour window</span>
+                          <div className="grid grid-cols-1 gap-2">
+                            {TIME_SLOTS.map((slot) => {
+                              const isSelected = selectedTimeSlot === slot;
+                              return (
+                                <button
+                                  key={slot}
+                                  type="button"
+                                  onClick={() => setSelectedTimeSlot(slot)}
+                                  className={`p-3.5 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all ${
+                                    isSelected 
+                                      ? 'bg-white border-brand-green text-brand-navy shadow-3xs ring-1 ring-brand-green/35' 
+                                      : 'bg-white border-gray-200 text-gray-600 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <span className="font-semibold">{slot}</span>
+                                  {isSelected ? (
+                                    <span className="w-4 h-4 bg-brand-green rounded-full flex items-center justify-center text-[9px] text-white">✓</span>
+                                  ) : (
+                                    <div className="w-4 h-4 border border-gray-300 rounded-full" />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Navigation Buttons for Step 2 */}
+                        <div className="flex gap-2.5 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setBookingStep(1)}
+                            className="bg-white border border-gray-200 hover:bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-wider py-4 px-5 rounded-xl cursor-pointer transition-all active:scale-95"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setBookingStep(3)}
+                            className="flex-1 bg-brand-green hover:bg-brand-accent text-white text-xs font-black uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] shadow-sm"
+                          >
+                            <span>Confirm Spot & Pay</span>
+                            <ChevronRight className="w-4 h-4" />
                           </button>
                         </div>
+                      </motion.div>
+                    )}
 
-                        <div className="space-y-2">
-                          {addresses.map((addr) => {
-                            const isSelected = selectedAddressId === addr.id;
-                            return (
-                              <button
-                                key={addr.id}
-                                type="button"
-                                onClick={() => setSelectedAddressId(addr.id)}
-                                className={`w-full p-4 rounded-3xl border text-left flex items-start gap-3 cursor-pointer transition-all ${
-                                  isSelected 
-                                    ? 'bg-[#FAFDFB] border-brand-green shadow-xs' 
-                                    : 'bg-white border-gray-200 hover:bg-slate-50'
-                                }`}
-                              >
-                                <MapPin className={`w-4 h-4 shrink-0 mt-0.5 ${isSelected ? 'text-brand-green' : 'text-gray-400'}`} />
-                                <div>
-                                  <span className="text-[10px] font-sans font-black uppercase tracking-wider text-slate-800 block">
-                                    {addr.label}
-                                  </span>
-                                  <span className="text-[10px] text-gray-500 block leading-tight mt-0.5 font-semibold">
-                                    {addr.details}
-                                  </span>
-                                  <div className="flex gap-2 text-[8px] text-gray-400 font-bold mt-1 uppercase">
-                                    <span className="flex items-center gap-1">
-                                      <Phone className="w-2 h-2 text-gray-400" />
-                                      <span>{addr.phone}</span>
+                    {bookingStep === 3 && (
+                      <motion.div
+                        key="step-3"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="space-y-4"
+                      >
+                        {/* Selection Address Drops */}
+                        <div className="space-y-2 text-left">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy">1. Carriage Spot Address</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsAddrModalOpen(true);
+                                setNewAddrLabel('Home');
+                                setNewAddrDetails('');
+                                setNewAddrPhone('');
+                                setNewAddrLandmark('');
+                              }}
+                              className="text-[9px] text-[#4E9F3D] font-black uppercase hover:underline font-mono"
+                            >
+                              + Add Spot
+                            </button>
+                          </div>
+
+                          <div className="space-y-2">
+                            {addresses.map((addr) => {
+                              const isSelected = selectedAddressId === addr.id;
+                              return (
+                                <button
+                                  key={addr.id}
+                                  type="button"
+                                  onClick={() => setSelectedAddressId(addr.id)}
+                                  className={`w-full p-3.5 rounded-2xl border text-left flex items-start gap-3 cursor-pointer transition-all ${
+                                    isSelected 
+                                      ? 'bg-[#FAFDFB] border-brand-green shadow-3xs' 
+                                      : 'bg-white border-gray-200 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <MapPin className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isSelected ? 'text-brand-green' : 'text-gray-400'}`} />
+                                  <div>
+                                    <span className="text-[9px] font-sans font-black uppercase tracking-wider text-slate-800 block">
+                                      {addr.label}
                                     </span>
-                                    {addr.landmark && <span>• Landmark: {addr.landmark}</span>}
+                                    <span className="text-[10px] text-gray-500 block leading-tight mt-0.5 font-semibold">
+                                      {addr.details}
+                                    </span>
+                                    <div className="flex gap-2 text-[8px] text-gray-400 font-bold mt-1 uppercase">
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="w-2 h-2 text-gray-400" />
+                                        <span>{addr.phone}</span>
+                                      </span>
+                                      {addr.landmark && <span>• Landmark: {addr.landmark}</span>}
+                                    </div>
                                   </div>
-                                </div>
-                              </button>
-                            );
-                          })}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Payment Mode Toggles */}
-                      <div className="space-y-2.5 text-left">
-                        <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">Payment Terms</span>
-                        <div className="grid grid-cols-1 gap-2">
-                          {[
-                            { id: 'cash_on_delivery', title: 'Cash / UPI on Delivery', subtitle: 'Pay when valet delivers clean clothes' },
-                            { id: 'online_payment', title: 'Secured Digital Receipt link', subtitle: 'Receive SMS with online GPay/PhonePe link' },
-                            { id: 'whatsapp', title: 'WhatsApp PDF Invoice link', subtitle: 'Approve digital weights before billing' }
-                          ].map(pay => {
-                            const isSelected = paymentMethod === pay.id;
-                            return (
-                              <button
-                                key={pay.id}
-                                type="button"
-                                onClick={() => setPaymentMethod(pay.id as any)}
-                                className={`p-3.5 rounded-2xl border text-left flex items-start gap-3 cursor-pointer transition-all ${
-                                  isSelected 
-                                    ? 'bg-[#FAFDFB] border-brand-navy shadow-3xs' 
-                                    : 'bg-white border-gray-200 hover:bg-slate-50'
-                                }`}
-                              >
-                                <div className="mt-0.5">
-                                  {isSelected ? (
-                                    <div className="w-4 h-4 rounded-full bg-brand-green flex items-center justify-center text-[8px] text-white font-bold">✓</div>
-                                  ) : (
-                                    <div className="w-4 h-4 rounded-full border border-gray-305 border-gray-300" />
-                                  )}
-                                </div>
-                                <div>
-                                  <span className="text-[11px] font-bold text-slate-800 block">{pay.title}</span>
-                                  <span className="text-[9.5px] text-gray-400 block leading-none mt-0.5 font-semibold">{pay.subtitle}</span>
-                                </div>
-                              </button>
-                            );
-                          })}
+                        {/* Payment Mode Toggles */}
+                        <div className="space-y-2 text-left">
+                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">2. Payment Terms</span>
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {[
+                              { id: 'cash_on_delivery', title: 'Cash / UPI on Delivery', subtitle: 'Pay when valet delivers clothes' },
+                              { id: 'online_payment', title: 'Secured UPI Link SMS', subtitle: 'SMS digital payment invoice link' },
+                              { id: 'whatsapp', title: 'WhatsApp PDF billing', subtitle: 'Approve weights before digital payment' }
+                            ].map(pay => {
+                              const isSelected = paymentMethod === pay.id;
+                              return (
+                                <button
+                                  key={pay.id}
+                                  type="button"
+                                  onClick={() => setPaymentMethod(pay.id as any)}
+                                  className={`p-3 rounded-xl border text-left flex items-start gap-2.5 cursor-pointer transition-all ${
+                                    isSelected 
+                                      ? 'bg-[#FAFDFB] border-brand-navy shadow-3xs ring-1 ring-brand-navy/10' 
+                                      : 'bg-white border-gray-200 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <div className="mt-0.5">
+                                    {isSelected ? (
+                                      <div className="w-3.5 h-3.5 rounded-full bg-brand-green flex items-center justify-center text-[8px] text-white font-bold">✓</div>
+                                    ) : (
+                                      <div className="w-3.5 h-3.5 rounded-full border border-gray-300" />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <span className="text-[10.5px] font-bold text-slate-800 block leading-none">{pay.title}</span>
+                                    <span className="text-[8.5px] text-gray-400 block leading-tight mt-0.5 font-semibold">{pay.subtitle}</span>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Final Dispatch Button */}
-                      <button
-                        onClick={handlePlaceOrder}
-                        className="w-full bg-brand-green hover:bg-brand-accent text-white font-black py-4.5 rounded-2xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-95 shadow-md shadow-brand-green/10"
-                      >
-                        <span className="flex items-center justify-center gap-2">
-                          <Truck className="w-4 h-4 text-white" />
-                          <span>Confirm Booking & Dispatch Scooter</span>
-                        </span>
-                      </button>
+                        {/* COMPREHENSIVE RECAP CARD */}
+                        <div className="bg-[#FAFDFB] border border-brand-green/15 rounded-2xl p-4 text-left space-y-2.5 shadow-3xs">
+                          <span className="text-[9px] font-mono uppercase font-black tracking-widest text-brand-green block">Order Billing Breakdown</span>
+                          
+                          <div className="text-[11px] font-semibold text-gray-600 space-y-1">
+                            {basketItems.map((item, idx) => {
+                              let garmentLabel = item.id.toUpperCase();
+                              let rate = 20;
+                              if (item.id === 'shirt') rate = item.service === 'ironing' ? 20 : item.service === 'wash_iron' ? 55 : 110;
+                              else if (item.id === 'trouser') rate = item.service === 'ironing' ? 20 : item.service === 'wash_iron' ? 60 : 120;
+                              else if (item.id === 'saree') rate = item.service === 'ironing' ? 40 : item.service === 'wash_iron' ? 99 : 220;
+                              else if (item.id === 'bedsheet') rate = 50;
 
-                    </div>
-                  )}
+                              const amt = rate * item.quantity;
+                              return (
+                                <div key={idx} className="flex justify-between">
+                                  <span>{item.quantity}x {garmentLabel} ({item.service === 'ironing' ? 'Iron' : item.service === 'wash_iron' ? 'Wash+Iron' : 'Dry Clean'})</span>
+                                  <span>₹{amt}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
 
-                  {basketItems.length === 0 && (
-                    <div className="py-12 text-center text-gray-400 font-semibold space-y-4">
-                      <ShoppingBag className="w-10 h-10 text-gray-300 mx-auto" />
-                      <p className="text-xs leading-relaxed max-w-[280px] mx-auto">
-                        Your laundry basket is empty. Please select service tabs above and count some clothes to book.
-                      </p>
-                      <button
-                        onClick={() => setActiveTab('home')}
-                        className="bg-brand-navy text-white text-[10px] uppercase tracking-widest font-black py-2.5 px-4 rounded-xl"
-                      >
-                        Explore Catalog Menu
-                      </button>
-                    </div>
-                  )}
+                          <div className="border-t border-gray-100 pt-2 flex flex-col gap-1 text-[11px] font-bold text-slate-700">
+                            <div className="flex justify-between font-medium text-gray-400 text-[10px]">
+                              <span>Subtotal</span>
+                              <span>₹{getBasketTotals().subtotal}</span>
+                            </div>
+                            {getBasketTotals().savings > 0 && (
+                              <div className="flex justify-between text-red-500 text-[10px]">
+                                <span>3 Shirts Free Discount</span>
+                                <span>-₹{getBasketTotals().savings}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between text-brand-navy text-xs pt-1 border-t border-dashed border-gray-100">
+                              <span>Grand Estimate Total</span>
+                              <span className="text-sm font-black text-brand-green font-mono">₹{getBasketTotals().finalAmount}</span>
+                            </div>
+                          </div>
 
+                          <div className="border-t border-gray-100 pt-2 flex items-center gap-1.5 text-[8.5px] font-mono text-gray-400 font-extrabold uppercase">
+                            <Clock className="w-3 h-3 text-brand-accent shrink-0" />
+                            <span>Scheduled: Day+{selectedDateOffset} ({selectedTimeSlot})</span>
+                          </div>
+                        </div>
+
+                        {/* Bottom Navigation Control Bar */}
+                        <div className="flex gap-2.5 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setBookingStep(2)}
+                            className="bg-white border border-gray-200 hover:bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-wider py-4.5 px-5 rounded-xl cursor-pointer transition-all active:scale-95"
+                          >
+                            Back
+                          </button>
+                          
+                          <button
+                            onClick={handlePlaceOrder}
+                            className="flex-1 bg-brand-green hover:bg-brand-accent text-white font-black py-4.5 rounded-xl text-xs uppercase tracking-widest cursor-pointer transition-all active:scale-95 shadow-md shadow-brand-green/10"
+                          >
+                            <span className="flex items-center justify-center gap-2">
+                              <Truck className="w-4 h-4 text-white" />
+                              <span>Confirm Booking</span>
+                            </span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
 
