@@ -1,0 +1,6 @@
+{
+  "name": "Fresh & Fold",
+  "description": "On-demand laundry pickup & delivery service. Clean, fresh, on-time garment care, dry cleaning, and ironing at your doorstep.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
