@@ -201,7 +201,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* BOUTIQUE GARMENT WORKSPACE CONTAINER */}
-      <div className="w-full max-w-md mx-auto h-screen md:h-[820px] bg-[#FAFDFB] flex flex-col relative overflow-hidden md:rounded-[40px] md:shadow-[0_30px_70px_rgba(30,81,40,0.12)] md:border md:border-brand-green/15 z-10 selection:bg-brand-yellow/30">
+      <div className="w-full max-w-md mx-auto h-[100dvh] md:h-[820px] bg-[#FAFDFB] flex flex-col relative overflow-hidden md:rounded-[40px] md:shadow-[0_30px_70px_rgba(30,81,40,0.12)] md:border md:border-brand-green/15 z-10 selection:bg-brand-yellow/30">
         
         {/* MAIN WEB PORTLET APP BODY: Scroll window */}
         <div className="flex-1 bg-slate-50 flex flex-col overflow-hidden relative">

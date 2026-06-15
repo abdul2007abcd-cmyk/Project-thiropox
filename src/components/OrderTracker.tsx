@@ -125,7 +125,7 @@ export default function OrderTracker({
                 </span>
 
                 {/* mini status context indicator */}
-                <span className="text-[7px] text-gray-400 scale-90 whitespace-nowrap mt-0.5 font-semibold">
+                <span className="text-[7px] text-gray-400 text-center max-w-[50px] leading-tight block mt-0.5 font-semibold">
                   {step.desc}
                 </span>
               </div>
