@@ -186,7 +186,7 @@ export default function App() {
 
     setOrders([newOrder, ...orders]);
     setBasketItems([]); // clear cart
-    setSuccessToast(`Order Registered: ${orderNo}! Valet assigned.`);
+    setSuccessToast(`Order Registered: ${orderNo}! Rider assigned.`);
     
     // Jump to tracking screen
     setActiveTab('orders');
@@ -214,7 +214,7 @@ export default function App() {
     setNewAddrPhone('');
     setNewAddrLandmark('');
     setIsAddrModalOpen(false);
-    setSuccessToast("Secure delivery pickup point saved!");
+    setSuccessToast("Delivery address saved!");
   };
 
   return (
@@ -239,7 +239,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* BOUTIQUE GARMENT WORKSPACE CONTAINER */}
+      {/* LAUNDRY WORKSPACE CONTAINER */}
       <div className="w-full max-w-md mx-auto h-[100dvh] md:h-[820px] bg-[#FAFDFB] flex flex-col relative overflow-hidden md:rounded-[40px] md:shadow-[0_30px_70px_rgba(30,81,40,0.12)] md:border md:border-brand-green/15 z-10 selection:bg-brand-yellow/30">
         
         {/* MAIN WEB PORTLET APP BODY: Scroll window */}
@@ -249,7 +249,7 @@ export default function App() {
               {/* ===================== tab: HOME ===================== */}
               {activeTab === 'home' && (
                 <div className="animate-fade-in space-y-6 pb-6">
-                  {/* Dynamic Boutique Hero Header */}
+                  {/* Dynamic Hero Header */}
                   <div className="bg-[#FAFDFB] px-5 pt-4.5 pb-6 border-b border-gray-150/50 space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -299,7 +299,7 @@ export default function App() {
                           onClick={() => setActiveTab('booking')}
                           className="bg-brand-yellow hover:bg-[#FAFDFB] text-brand-navy text-[9px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full transition-all hover:scale-105"
                         >
-                          Book Valet
+                          Book Now
                         </button>
                       </div>
                     </div>
@@ -329,10 +329,10 @@ export default function App() {
                       <div className="grid grid-cols-5 gap-0.5 text-center">
                         {[
                           { icon: <Truck className="w-4 h-4 text-brand-green" />, label: '1. Pickup', desc: 'Doorstep pickup' },
-                          { icon: <Sparkles className="w-4 h-4 text-[#4E9F3D]" />, label: '2. Clean', desc: 'Sanitary deep' },
-                          { icon: <Sliders className="w-4 h-4 text-brand-yellow" />, label: '3. Iron', desc: 'Steam treatment' },
-                          { icon: <Package className="w-4 h-4 text-brand-navy" />, label: '4. Fold', desc: 'Fresh wrap' },
-                          { icon: <Home className="w-4 h-4 text-brand-green" />, label: '5. Deliver', desc: 'Free drop' }
+                          { icon: <Sparkles className="w-4 h-4 text-[#4E9F3D]" />, label: '2. Clean', desc: 'Deep clean' },
+                          { icon: <Sliders className="w-4 h-4 text-brand-yellow" />, label: '3. Iron', desc: 'Ironing' },
+                          { icon: <Package className="w-4 h-4 text-brand-navy" />, label: '4. Fold', desc: 'Folding' },
+                          { icon: <Home className="w-4 h-4 text-brand-green" />, label: '5. Deliver', desc: 'Free delivery' }
                         ].map((p, idx) => (
                           <div key={idx} className="space-y-1.5">
                             <div className="w-9 h-9 mx-auto rounded-full bg-slate-100 flex items-center justify-center border border-gray-100">
@@ -346,12 +346,12 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* FAST CONCIERGE GARMENTS BOOKING CTA */}
+                  {/* FAST LAUNDRY BOOKING CTA */}
                   <div className="px-5">
                     <div className="bg-[#FAFDFB] p-5 rounded-3xl border-2 border-brand-green/30 space-y-4 shadow-sm text-center">
                       <Package className="w-10 h-10 text-brand-green mx-auto" />
                       <div className="space-y-1">
-                        <h3 className="font-serif font-black text-brand-navy text-lg">Instant Doorstep Carriage</h3>
+                        <h3 className="font-serif font-black text-brand-navy text-lg">Instant Doorstep Pickup</h3>
                         <p className="text-xs text-gray-500 font-semibold leading-relaxed max-w-[280px] mx-auto">
                           Select the counts of Shirts, Jeans, Sarees, Bedsheets or towels and we'll calculate everything. Pickup and delivery is 100% Free!
                         </p>
@@ -423,14 +423,13 @@ export default function App() {
                   </div>
                 </div>
               )}
-
-              {/* ===================== tab: BOOKING ===================== */}
+                    {/* ===================== tab: BOOKING ===================== */}
               {activeTab === 'booking' && (
                 <div className="animate-fade-in space-y-5 px-5 pt-4.5 pb-6">
                   {/* Form Header */}
                   <div className="bg-[#FAFDFB] p-4 rounded-2xl border border-gray-100 shadow-2xs flex items-center justify-between">
                     <div>
-                      <h2 className="text-base font-black text-brand-navy uppercase tracking-tight">Atelier Step Booking</h2>
+                      <h2 className="text-base font-black text-brand-navy uppercase tracking-tight">Easy Laundry Booking</h2>
                       <span className="text-[9px] text-[#4E9F3D] uppercase tracking-widest font-mono font-black block mt-0.5">
                         Step {bookingStep} of 3 • Chennai Doorstep
                       </span>
@@ -441,9 +440,9 @@ export default function App() {
                   {/* Progressive Stepper Indicator */}
                   <div className="flex items-center justify-between p-3.5 bg-white border border-gray-100 rounded-2xl shadow-3xs select-none">
                     {[
-                      { step: 1, title: 'Garments', icon: <ShoppingBag className="w-4 h-4" /> },
+                      { step: 1, title: 'Clothes', icon: <ShoppingBag className="w-4 h-4" /> },
                       { step: 2, title: 'Schedule', icon: <Clock className="w-4 h-4" /> },
-                      { step: 3, title: 'Spot & Pay', icon: <MapPin className="w-4 h-4" /> },
+                      { step: 3, title: 'Address & Pay', icon: <MapPin className="w-4 h-4" /> },
                     ].map((s, idx) => {
                       const isActive = bookingStep === s.step;
                       const isCompleted = bookingStep > s.step;
@@ -533,7 +532,7 @@ export default function App() {
                             <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-center space-y-2">
                               <ShoppingBag className="w-6 h-6 text-emerald-600/60 mx-auto" />
                               <p className="text-[11px] text-emerald-800 font-semibold leading-relaxed">
-                                Please add some garments (count Shirts, Trousers, Sarees, etc. above) to start your zero-charge doorstep pickup carriage process.
+                                Please add some clothes (count Shirts, Trousers, Sarees, etc. above) to start your free doorstep pickup process.
                               </p>
                             </div>
                           )}
@@ -549,9 +548,9 @@ export default function App() {
                         exit={{ opacity: 0, x: -10 }}
                         className="space-y-5"
                       >
-                        {/* Pick a carriage date */}
+                        {/* Pick a pickup date */}
                         <div className="space-y-2 text-left">
-                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">1. Select Valet Pickup Day</span>
+                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">1. Select Pickup Day</span>
                           <div className="grid grid-cols-3 gap-2">
                             {[0, 1, 2].map((offset) => {
                               const d = new Date();
@@ -582,7 +581,7 @@ export default function App() {
 
                         {/* Time Slot List */}
                         <div className="space-y-2 text-left">
-                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">2. Select Valet Hour window</span>
+                          <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">2. Select Pickup Time Window</span>
                           <div className="grid grid-cols-1 gap-2">
                             {TIME_SLOTS.map((slot) => {
                               const isSelected = selectedTimeSlot === slot;
@@ -623,7 +622,7 @@ export default function App() {
                             onClick={() => setBookingStep(3)}
                             className="flex-1 bg-brand-green hover:bg-brand-accent text-white text-xs font-black uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98] shadow-sm"
                           >
-                            <span>Confirm Spot & Pay</span>
+                            <span>Confirm Address & Pay</span>
                             <ChevronRight className="w-4 h-4" />
                           </button>
                         </div>
@@ -641,7 +640,7 @@ export default function App() {
                         {/* Selection Address Drops */}
                         <div className="space-y-2 text-left">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy">1. Carriage Spot Address</span>
+                            <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy">1. Delivery Address</span>
                             <button
                               type="button"
                               onClick={() => {
@@ -653,7 +652,7 @@ export default function App() {
                               }}
                               className="text-[9px] text-[#4E9F3D] font-black uppercase hover:underline font-mono"
                             >
-                              + Add Spot
+                              + Add Address
                             </button>
                           </div>
 
@@ -698,9 +697,9 @@ export default function App() {
                           <span className="text-xs uppercase tracking-widest font-mono font-black text-brand-navy block">2. Payment Terms</span>
                           <div className="grid grid-cols-1 gap-1.5">
                             {[
-                              { id: 'cash_on_delivery', title: 'Cash / UPI on Delivery', subtitle: 'Pay when valet delivers clothes' },
+                              { id: 'cash_on_delivery', title: 'Cash / UPI on Delivery', subtitle: 'Pay when rider delivers clothes' },
                               { id: 'online_payment', title: 'Secured UPI Link SMS', subtitle: 'SMS digital payment invoice link' },
-                              { id: 'whatsapp', title: 'WhatsApp PDF billing', subtitle: 'Approve weights before digital payment' }
+                              { id: 'whatsapp', title: 'WhatsApp PDF billing', subtitle: 'Approve weights before payment' }
                             ].map(pay => {
                               const isSelected = paymentMethod === pay.id;
                               return (

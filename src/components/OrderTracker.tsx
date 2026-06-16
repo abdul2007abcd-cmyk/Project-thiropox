@@ -30,11 +30,11 @@ export default function OrderTracker({
   // High fidelity five-steps from flyer:
   // PICKUP -> CLEAN -> IRON -> FOLD -> DELIVER
   const steps = [
-    { label: 'PICKUP', statusMatch: ['Scheduled', 'Picked Up'], desc: 'Scooter dispatched' },
-    { label: 'CLEAN', statusMatch: ['Cleaning'], desc: 'Eco botanical bath' },
-    { label: 'IRON', statusMatch: ['Ironing'], desc: 'Deep steam press' },
-    { label: 'FOLD', statusMatch: ['Folded'], desc: 'Hand packaging' },
-    { label: 'DELIVER', statusMatch: ['Delivered'], desc: 'Doorstep arrival' }
+    { label: 'PICKUP', statusMatch: ['Scheduled', 'Picked Up'], desc: 'Rider dispatched' },
+    { label: 'CLEAN', statusMatch: ['Cleaning'], desc: 'Eco friendly wash' },
+    { label: 'IRON', statusMatch: ['Ironing'], desc: 'Steam press' },
+    { label: 'FOLD', statusMatch: ['Folded'], desc: 'Clothes folded' },
+    { label: 'DELIVER', statusMatch: ['Delivered'], desc: 'Doorstep delivery' }
   ];
 
   // Helper to determine step visual state
@@ -72,7 +72,7 @@ export default function OrderTracker({
       {/* Header Info */}
       <div className="flex items-center justify-between z-10 relative">
         <div>
-          <span className="text-[9px] font-mono font-black text-brand-accent uppercase tracking-wider block">Atelier Order Voucher</span>
+          <span className="text-[9px] font-mono font-black text-brand-accent uppercase tracking-wider block">Order Receipt</span>
           <h3 className="font-serif font-black text-brand-navy text-sm tracking-wide">ID: {orderId}</h3>
         </div>
         <span className={`text-[10px] font-sans font-black uppercase px-3 py-1 rounded-full ${
@@ -91,7 +91,7 @@ export default function OrderTracker({
       {/* Visual Five Step Pipeline from Flyer */}
       <div className="space-y-3.5">
         <span className="text-[9px] font-mono text-gray-400 font-extrabold uppercase tracking-widest block">
-          5-Stage Fresh & Fold cycle
+          5-Step Process
         </span>
 
         <div className="flex items-center justify-between relative pt-1">
@@ -141,7 +141,7 @@ export default function OrderTracker({
           <span className="font-bold text-brand-navy">{pickupDate} | {pickupTimeSlot}</span>
         </div>
         <div className="flex items-start justify-between gap-3 text-wrap">
-          <span className="shrink-0">Concierge Carriage Spot:</span>
+          <span className="shrink-0">Delivery Location:</span>
           <span className="text-right text-[#1e5128] font-bold line-clamp-1 truncate max-w-[190px]">
             {addressDetails}
           </span>

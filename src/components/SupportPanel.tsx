@@ -30,15 +30,15 @@ export default function SupportPanel() {
 
     // Simulate smart agent response
     setTimeout(() => {
-      let reply = "Got it! Let me check that for you. Our Triplicane hub is fully operational today! If you wish to proceed, you can book instantly through our App form or we can schedule a valet courier directly from here.";
+      let reply = "Got it! Let me check that for you. Our Triplicane shop is open today! You can book easily on our app, or we can plan a pickup rider for you.";
       
       const normalized = userMsg.toLowerCase();
       if (normalized.includes('price') || normalized.includes('rate') || normalized.includes('cost')) {
-        reply = "Our rates are highly transparent: Ironing is flat ₹20/item, kids wear ₹15/item. Wash + Iron starts at ₹55/item. No hidden delivery fees! Check out our Booking panel for a real-time invoice builder.";
+        reply = "Our rates are simple: Ironing is flat ₹20/item, kids wear ₹15/item. Wash + Iron starts at ₹55/item. No hidden delivery fees! Check out our Booking panel for a real-time price count.";
       } else if (normalized.includes('free') || normalized.includes('offer') || normalized.includes('discount')) {
         reply = "Yes! Our special offer is active: Your very first 3 Shirts are Ironed 100% FREE! We also offer absolutely free pickup and delivery in Triplicane with no minimum order!";
       } else if (normalized.includes('whatsapp') || normalized.includes('phone') || normalized.includes('contact')) {
-        reply = "Our official hotline is 9444346259. You can call us or message anytime. Press standard dialer links on the bottom of our Home panel to start a real chat!";
+        reply = "Our official phone number is 9444346259. You can call us or message anytime. Press standard dialer links on the bottom of our Home panel to start a real chat!";
       }
 
       setChatLog(prev => [...prev, { sender: 'agent', text: reply, time: now }]);
@@ -59,7 +59,7 @@ export default function SupportPanel() {
     if (isMatch) {
       setServiceResult("Service is Available! We proudly offer 100% FREE Doorstep Pickup & Delivery in your area with zero extra fees.");
     } else {
-      setServiceResult("Notice: That is slightly outside our primary Triplicane hub. But we normally can accommodate bulk orders. Please ping our Support team via WhatsApp above to request a custom valet!");
+      setServiceResult("Notice: That is slightly outside our primary Triplicane shop. But we normally can help with large orders. Please message our support team on WhatsApp to plan a pickup!");
     }
   };
 
@@ -72,7 +72,7 @@ export default function SupportPanel() {
         <MessageSquare className="absolute -right-6 -bottom-6 w-32 h-32 opacity-15 rotate-12 text-white shrink-0" />
 
         <span className="bg-emerald-500 text-white text-[9px] font-black uppercase px-2.5 py-1 rounded-md tracking-wider inline-block mb-2">
-          Direct Line Concierge
+          Instant Help Line
         </span>
 
         <h3 className="font-serif font-black text-xl leading-tight">
@@ -80,7 +80,7 @@ export default function SupportPanel() {
         </h3>
         
         <p className="text-[11px] text-[#FAFDFB]/85 mt-2 max-w-[280px] font-semibold">
-          Prefer personal booking over forms? Send us a list of your clothes or call directly. We operate 7 days a week!
+          Prefer booking with a person? Send us a list of your clothes or call directly. We operate 7 days a week!
         </p>
 
         <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-3 border-t border-emerald-500/40 select-none">
@@ -106,7 +106,7 @@ export default function SupportPanel() {
       {/* CHENNAI SERVICEABILITY APP CHECKER */}
       <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-xs space-y-3">
         <span className="text-[10px] font-mono text-gray-400 font-extrabold uppercase tracking-widest block">
-          Zone Coverage Area Validator
+          Check Your Location
         </span>
         <h3 className="font-serif font-black text-brand-navy text-sm">
           Check if Free Delivery applies to you
@@ -141,7 +141,7 @@ export default function SupportPanel() {
         <div className="flex items-center gap-2 pb-2.5 border-b border-gray-100">
           <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></div>
           <div>
-            <span className="text-[9px] font-mono uppercase text-gray-400 block font-black">Interactive AI Desk</span>
+            <span className="text-[9px] font-mono uppercase text-gray-400 block font-black">Help Desk Chat</span>
             <span className="text-xs font-bold text-brand-navy">Pre-Order Assistant</span>
           </div>
         </div>

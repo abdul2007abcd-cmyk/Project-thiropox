@@ -109,16 +109,16 @@ export const INITIAL_ORDERS: Order[] = [
 ];
 
 export const TIME_SLOTS = [
-  '9:00 AM - 12:00 PM (Morning Valet)',
-  '12:00 PM - 3:00 PM (Afternoon Valet)',
-  '3:00 PM - 6:00 PM (Evening Valet)',
-  '6:00 PM - 9:00 PM (Night Valet)'
+  '9:00 AM - 12:00 PM (Morning Pickup)',
+  '12:00 PM - 3:00 PM (Afternoon Pickup)',
+  '3:00 PM - 6:00 PM (Evening Pickup)',
+  '6:00 PM - 9:00 PM (Night Pickup)'
 ];
 
 export const FAQ_ITEMS = [
   {
     question: 'How does the free doorstep pickup & delivery work?',
-    answer: 'Simply choose your garments and preferred time slot in the app. Our scooter-riding valet will reach your doorstep in Triplicane & surrounding areas to pick up your laundry. Once cleaned to perfection, ironed, and folded, we deliver it back for free!'
+    answer: 'Simply choose your clothes and preferred time slot in the app. Our scooter rider will reach your doorstep in Triplicane & surrounding areas to pick up your laundry. Once cleaned to perfection, ironed, and folded, we deliver it back for free!'
   },
   {
     question: 'Is the "First 3 Shirts Free Ironing" offer really free?',
