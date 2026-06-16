@@ -196,29 +196,37 @@ export default function GarmentPicker({ selectedItems, onItemsChange, isFirstOrd
                 </div>
 
                 {/* Counter controls */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0 select-none">
                   {qty > 0 ? (
-                    <>
+                    <div className="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-205/60 select-none">
                       <button
                         type="button"
                         onClick={() => handleUpdateQty(garment.id, activeTab, -1)}
-                        className="w-8 h-8 rounded-lg border border-gray-250 bg-white hover:bg-slate-50 flex items-center justify-center text-xs font-bold text-gray-550 transition-colors active:scale-90"
+                        className="w-10 h-10 rounded-xl bg-white active:bg-slate-200 flex items-center justify-center text-[#1e5128] font-bold shadow-3xs cursor-pointer transition-all active:scale-90"
                       >
-                        <Minus className="w-3.5 h-3.5" />
+                        <Minus className="w-4 h-4" />
                       </button>
-                      <span className="w-6 text-center font-mono font-bold text-xs text-brand-navy">
+                      <span className="w-8 text-center font-mono font-black text-xs text-brand-navy">
                         {qty}
                       </span>
-                    </>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateQty(garment.id, activeTab, 1)}
-                    className="h-8 px-2.5 rounded-lg bg-brand-green hover:bg-brand-accent text-white flex items-center justify-center gap-1 text-xs font-extrabold tracking-wider transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    {qty === 0 && <span>Add</span>}
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateQty(garment.id, activeTab, 1)}
+                        className="w-10 h-10 rounded-xl bg-brand-green text-white active:bg-brand-accent flex items-center justify-center font-bold shadow-3xs cursor-pointer transition-all active:scale-90"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateQty(garment.id, activeTab, 1)}
+                      className="h-11 px-4.5 rounded-2xl bg-brand-green hover:bg-brand-accent text-[#FAFDFB] flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.03] active:scale-95 cursor-pointer shadow-sm shadow-brand-green/10"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );

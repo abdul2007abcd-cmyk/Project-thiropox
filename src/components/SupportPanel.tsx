@@ -83,21 +83,21 @@ export default function SupportPanel() {
           Prefer personal booking over forms? Send us a list of your clothes or call directly. We operate 7 days a week!
         </p>
 
-        <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-3 border-t border-emerald-500/40">
+        <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-3 border-t border-emerald-500/40 select-none">
           <a
             href="tel:9444346259"
-            className="flex-1 bg-white hover:bg-emerald-50 text-emerald-700 text-xs font-black uppercase tracking-wider py-2.5 px-4 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all active:scale-95"
+            className="flex-1 bg-white hover:bg-emerald-50 text-emerald-700 h-[48px] text-xs font-black uppercase tracking-wider px-4 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm"
           >
-            <Phone className="w-3.5 h-3.5" />
+            <Phone className="w-3.5 h-3.5 text-brand-green" />
             <span>Call 9444346259</span>
           </a>
           <a
             href="https://wa.me/919444346259?text=Hello%20Fresh%20and%20Fold,%20I%20want%20to%20schedule%20a%20laundry%20pickup"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-emerald-900 hover:bg-emerald-950 text-[#FAFDFB] text-xs font-black uppercase tracking-wider py-2.5 px-4 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all active:scale-95"
+            className="flex-1 bg-emerald-900 hover:bg-emerald-950 text-[#FAFDFB] h-[48px] text-xs font-black uppercase tracking-wider px-4 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm"
           >
-            <MessageSquare className="w-3.5 h-3.5" />
+            <MessageSquare className="w-3.5 h-3.5 text-brand-light-green" />
             <span>Live Chat</span>
           </a>
         </div>

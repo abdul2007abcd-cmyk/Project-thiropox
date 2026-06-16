@@ -441,9 +441,9 @@ export default function App() {
                   {/* Progressive Stepper Indicator */}
                   <div className="flex items-center justify-between p-3.5 bg-white border border-gray-100 rounded-2xl shadow-3xs select-none">
                     {[
-                      { step: 1, title: 'Garments', icon: <ShoppingBag className="w-3.5 h-3.5" /> },
-                      { step: 2, title: 'Schedule', icon: <Clock className="w-3.5 h-3.5" /> },
-                      { step: 3, title: 'Spot & Pay', icon: <MapPin className="w-3.5 h-3.5" /> },
+                      { step: 1, title: 'Garments', icon: <ShoppingBag className="w-4 h-4" /> },
+                      { step: 2, title: 'Schedule', icon: <Clock className="w-4 h-4" /> },
+                      { step: 3, title: 'Spot & Pay', icon: <MapPin className="w-4 h-4" /> },
                     ].map((s, idx) => {
                       const isActive = bookingStep === s.step;
                       const isCompleted = bookingStep > s.step;
@@ -455,18 +455,18 @@ export default function App() {
                             type="button"
                             disabled={isDisabled}
                             onClick={() => setBookingStep(s.step)}
-                            className="flex flex-col items-center flex-1 focus:outline-none group cursor-pointer transition-all"
+                            className="flex flex-col items-center flex-1 focus:outline-none group cursor-pointer transition-all disabled:opacity-40"
                           >
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all ${
+                            <div className={`w-9.5 h-9.5 rounded-full flex items-center justify-center text-[11px] font-black transition-all ${
                               isActive 
-                                ? 'bg-brand-green text-white ring-4 ring-brand-green/20 scale-105' 
+                                ? 'bg-brand-green text-white ring-4 ring-brand-green/20 scale-105 shadow-sm' 
                                 : isCompleted 
                                   ? 'bg-brand-navy text-[#FAFDFB]' 
                                   : 'bg-slate-100 text-gray-400 group-hover:bg-slate-205'
                             }`}>
-                              {isCompleted ? '✓' : s.step}
+                              {isCompleted ? '✓' : isActive ? s.icon : s.step}
                             </div>
-                            <span className={`text-[8.5px] uppercase tracking-wider font-extrabold mt-1.5 transition-colors ${isActive ? 'text-brand-green' : 'text-gray-400'}`}>
+                            <span className={`text-[8.5px] uppercase tracking-wider font-extrabold mt-1.5 transition-colors ${isActive ? 'text-brand-green font-black' : 'text-gray-450 text-gray-400'}`}>
                               {s.title}
                             </span>
                           </button>
